@@ -100,6 +100,11 @@ const iOSButtonStyle: CSSAttribute = {
   },
 };
 
+const mobileActionClickable: CSSAttribute = {
+  position: "relative",
+  zIndex: "1",
+};
+
 const mobileSerpHandlers: Record<string, SerpHandler> = {
   // All
   "": handleSerp({
@@ -276,6 +281,10 @@ const mobileSerpHandlers: Record<string, SerpHandler> = {
         innerTargets: ".xpd, .tRkSqb",
       },
     ],
+    pageProps: {
+      $site: "google",
+      $category: "web",
+    },
   }),
   // Books
   bks: handleSerp({
@@ -296,6 +305,10 @@ const mobileSerpHandlers: Record<string, SerpHandler> = {
         actionStyle: mobileRegularActionStyle,
       },
     ],
+    pageProps: {
+      $site: "google",
+      $category: "books",
+    },
   }),
   // Images
   isch: handleSerp({
@@ -366,6 +379,85 @@ const mobileSerpHandlers: Record<string, SerpHandler> = {
         },
       },
     ],
+    pageProps: {
+      $site: "google",
+      $category: "images",
+    },
+  }),
+  "udm=2": handleSerp({
+    globalStyle: mobileGlobalStyle,
+    controlHandlers: [
+      // Main control on Images page
+      {
+        target: "#appbar",
+        style: {
+          "&:not(.ub-hidden)": {
+            display: "block",
+            padding: "8px 0 8px 16px",
+            fontSize: "13px",
+            ...iOSButtonStyle,
+          },
+        },
+      },
+      // Control on top of additional images
+      {
+        target: ".izYTqe > .PK06q:empty",
+        style: (controlRoot) => {
+          controlRoot.className = css({
+            paddingLeft: "18px",
+            ...iOSButtonStyle,
+          });
+          controlRoot.parentElement?.classList.add(
+            css({
+              marginBottom: "16px",
+            }),
+          );
+        },
+      },
+    ],
+    entryHandlers: [
+      // Regular Image
+      {
+        target: "[data-bla]",
+        level: ".srKDX.cvP2Ce > div",
+        url: "a",
+        title: ".Q6A6Dc",
+        actionTarget: ".N54PNb > [data-snf]:last-child",
+        actionPosition: "afterend",
+        actionStyle: {
+          display: "block",
+          fontSize: "11px",
+          padding: "0 0 8px 0",
+          ...iOSButtonStyle,
+        },
+      },
+      // Additional Images (when you click on a regular image)
+      {
+        target: ".isv-r",
+        url: "a:not([role='button'])",
+        title: "h3",
+        actionTarget: (root) => root,
+        actionStyle: {
+          display: "block",
+          fontSize: "12px",
+          lineHeight: "18px",
+          margin: "-2px 0 8px",
+          ...iOSButtonStyle,
+        },
+      },
+    ],
+    pagerHandlers: [
+      // Continuos Scrolling
+      {
+        target: '[id^="arc-srp"], [decode-data-ved]',
+        innerTargets: "[data-bla]",
+      },
+      // Additional Images
+      {
+        target: "c-wiz",
+        innerTargets: ".isv-r, .PK06q",
+      },
+    ],
   }),
   // News
   nws: handleSerp({
@@ -401,6 +493,7 @@ const mobileSerpHandlers: Record<string, SerpHandler> = {
           fontSize: "12px",
           marginTop: "-8px",
           padding: "0 16px 12px 16px",
+          ...mobileActionClickable,
           ...iOSButtonStyle,
         },
       },
@@ -411,7 +504,28 @@ const mobileSerpHandlers: Record<string, SerpHandler> = {
         actionTarget: "",
         actionStyle: mobileRegularActionStyle,
       },
+      {
+        target: ".SoAPf",
+        level: ".lU8tTd > [data-hveid]",
+        url: "a",
+        title: '[role="heading"][aria-level="3"]',
+        actionTarget: ".lSfe4c",
+        actionPosition: "afterend",
+        actionStyle: {
+          fontSize: "12px",
+          lineHeight: "16px",
+          marginTop: "-12px",
+          textAlign: "right",
+          ...mobileRegularActionStyle,
+          ...mobileActionClickable,
+          ...iOSButtonStyle,
+        },
+      },
     ],
+    pageProps: {
+      $site: "google",
+      $category: "news",
+    },
   }),
   // Videos
   vid: handleSerp({
@@ -474,11 +588,20 @@ const mobileSerpHandlers: Record<string, SerpHandler> = {
         innerTargets: ".mnr-c",
       },
     ],
+    pageProps: {
+      $site: "google",
+      $category: "videos",
+    },
   }),
 };
 
-export function getMobileSerpHandler(tbm: string): SerpHandler | null {
-  const serpHandler = mobileSerpHandlers[tbm];
+export function getMobileSerpHandler(
+  tbm: string,
+  udm: string,
+): SerpHandler | null {
+  const udmKey = `udm=${udm}`;
+  const serpHandler =
+    mobileSerpHandlers[udmKey in mobileSerpHandlers ? udmKey : tbm];
   if (!serpHandler) {
     return null;
   }

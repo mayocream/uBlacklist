@@ -38,7 +38,7 @@ export default {
     process.env.BROWSER === "safari"
       ? Object.values(SEARCH_ENGINES).flatMap(({ contentScripts }) =>
           contentScripts.map(({ matches, runAt }) => ({
-            js: ["scripts/content-script.js"],
+            js: ["scripts/import-content-script.js"],
             matches: [
               ...new Set(
                 matches.map((match) => {
@@ -46,7 +46,9 @@ export default {
                   if (!parsed) {
                     throw new Error(`Invalid match pattern: ${match}`);
                   }
-                  return `${parsed.scheme}://${parsed.host}/*`;
+                  return parsed.allURLs
+                    ? "<all_urls>"
+                    : `${parsed.scheme}://${parsed.host}/*`;
                 }),
               ),
             ],
@@ -116,5 +118,9 @@ export default {
           },
         ],
       }
-    : {}),
+    : process.env.BROWSER === "safari"
+      ? {
+          web_accessible_resources: ["scripts/content-script.js"],
+        }
+      : {}),
 };

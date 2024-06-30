@@ -1,6 +1,7 @@
 import { type CSSAttribute, css } from "../styles.ts";
 import type { SerpHandler } from "../types.ts";
 import {
+  type ControlHandler,
   type EntryHandler,
   handleSerp,
   hasDarkBackground,
@@ -100,6 +101,64 @@ const regularEntryHandler: Pick<
   },
 };
 
+const regularControlHandlers: ControlHandler[] = [
+  {
+    target: "#result-stats",
+    style: {
+      // Displays on the next line when part of the "Tools" bar
+      "#hdtbMenus :is(.BfdGL.ZkEmPc + div) &": {
+        display: "block",
+      },
+      "&:not(#hdtbMenus &)": {
+        paddingLeft: "8px",
+      },
+    },
+  },
+  {
+    target: "#slim_appbar:empty",
+    style: (controlRoot) => {
+      controlRoot.className = css({
+        "#slim_appbar > &:not(:only-child)": {
+          display: "none",
+        },
+      });
+      // Set appropriate margin when "Tools" bar is present:
+      controlRoot.closest("#appbar")?.classList.add(
+        css({
+          // Not present
+          "&:not(.hdtb-ab-o)": {
+            margin: "16px 0",
+          },
+          // Present
+          "&:is(.hdtb-ab-o)": {
+            margin: "42px 0 -12px",
+          },
+          // Remove margin when no entry has been blocked
+          "&:has(.ub-hidden)": {
+            margin: "0 !important",
+          },
+        }),
+      );
+      // Set appropriate margin when there is an additional labels bar
+      if (controlRoot.matches(":is(:is(div + #tU52Vb) :scope)")) {
+        controlRoot.closest("#appbar")?.classList.add(
+          css({
+            margin: "0 0 24px 0 !important",
+          }),
+        );
+        controlRoot.closest("#slim_appbar")?.classList.add(
+          css({
+            ".hdtb-ab-o &": {
+              padding: "48px 0 0 0",
+            },
+            padding: "24px 0 0 0",
+          }),
+        );
+      }
+    },
+  },
+];
+
 const desktopSerpHandlers: Record<string, SerpHandler> = {
   // All
   "": handleSerp({
@@ -124,17 +183,7 @@ const desktopSerpHandlers: Record<string, SerpHandler> = {
       },
     },
     controlHandlers: [
-      {
-        target: "#result-stats",
-      },
-      {
-        target: "#slim_appbar:empty",
-        style: {
-          "#slim_appbar > &:not(:only-child)": {
-            display: "none",
-          },
-        },
-      },
+      ...regularControlHandlers,
       {
         target: "#botabar",
         position: "afterend",
@@ -544,15 +593,15 @@ const desktopSerpHandlers: Record<string, SerpHandler> = {
         innerTargets: ".I48dHb, .GHMsie, .ZHugbd",
       },
     ],
+    pageProps: {
+      $site: "google",
+      $category: "web",
+    },
   }),
   // Books
   bks: handleSerp({
     globalStyle: desktopGlobalStyle,
-    controlHandlers: [
-      {
-        target: "#result-stats",
-      },
-    ],
+    controlHandlers: [...regularControlHandlers],
     entryHandlers: [
       {
         target: ".Yr5TG",
@@ -563,17 +612,26 @@ const desktopSerpHandlers: Record<string, SerpHandler> = {
         actionStyle: desktopRegularActionStyle,
       },
     ],
+    pageProps: {
+      $site: "google",
+      $category: "books",
+    },
   }),
   // Images
   "udm=2": handleSerp({
     globalStyle: desktopGlobalStyle,
     controlHandlers: [
       {
-        target: "#appbar",
-        position: "afterbegin",
+        target: "#hdtbMenus",
+        style: {
+          lineHeight: "22px",
+        },
+      },
+      {
+        target: "#hdtb-sc > .PHj8of",
         style: {
           display: "block",
-          margin: "10px 0",
+          margin: "5px 0",
         },
       },
     ],
@@ -589,6 +647,10 @@ const desktopSerpHandlers: Record<string, SerpHandler> = {
         },
       },
     ],
+    pageProps: {
+      $site: "google",
+      $category: "images",
+    },
   }),
   isch: handleSerp({
     globalStyle: desktopGlobalStyle,
@@ -597,9 +659,22 @@ const desktopSerpHandlers: Record<string, SerpHandler> = {
         target: ".cEPPT",
         position: "afterend",
         style: {
+          "html[data-ub-dark='1'] &": {
+            color: "rgb(154, 160, 166)",
+          },
           color: "#70757a",
           display: "block",
           padding: "0 0 11px 165px",
+        },
+      },
+      {
+        target: ".ECgenc .itb-h",
+        style: {
+          "html[data-ub-dark='1'] &": {
+            color: "rgb(154, 160, 166)",
+          },
+          color: "#70757a",
+          padding: "6px 0 0 18px",
         },
       },
     ],
@@ -618,6 +693,10 @@ const desktopSerpHandlers: Record<string, SerpHandler> = {
         },
       },
     ],
+    pageProps: {
+      $site: "google",
+      $category: "images",
+    },
   }),
   // News
   nws: handleSerp({
@@ -631,11 +710,7 @@ const desktopSerpHandlers: Record<string, SerpHandler> = {
         whiteSpace: "nowrap",
       },
     },
-    controlHandlers: [
-      {
-        target: "#result-stats",
-      },
-    ],
+    controlHandlers: [...regularControlHandlers],
     entryHandlers: [
       // Regular
       {
@@ -680,15 +755,15 @@ const desktopSerpHandlers: Record<string, SerpHandler> = {
         innerTargets: ".SoaBEf, .JJZKK, .ZE0LJd, .S1FAPd",
       },
     ],
+    pageProps: {
+      $site: "google",
+      $category: "news",
+    },
   }),
   // Videos
   vid: handleSerp({
     globalStyle: desktopGlobalStyle,
-    controlHandlers: [
-      {
-        target: "#result-stats",
-      },
-    ],
+    controlHandlers: [...regularControlHandlers],
     entryHandlers: [
       {
         target: ".g, .iHxmLe",
@@ -705,6 +780,10 @@ const desktopSerpHandlers: Record<string, SerpHandler> = {
         innerTargets: ".g",
       },
     ],
+    pageProps: {
+      $site: "google",
+      $category: "videos",
+    },
   }),
 };
 

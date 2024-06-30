@@ -72,6 +72,7 @@ async function createCopyFiles(context: Context): Promise<() => Promise<void>> {
     "pages/popup.html",
     ...(watch && browser === "chrome" ? ["pages/watch.html"] : []),
     "scripts/active.js",
+    ...(browser === "safari" ? ["scripts/import-content-script.js"] : []),
     "third-party-notices.txt",
   ];
   if (watch) {
@@ -170,7 +171,7 @@ async function createBuildScripts(
     bundle: true,
     define: defineProcessEnv(context),
     entryPoints: sources.map((file) => path.join(srcDir, file)),
-    format: "esm",
+    format: "iife",
     jsx: "automatic",
     jsxDev: debug,
     // https://github.com/evanw/esbuild/issues/3418
